@@ -1,0 +1,15 @@
+.recharts-responsive-container {
+    margin-left: -8px;
+}
+
+.recharts-legend-wrapper {
+    display: none;
+}
+
+.recharts-curve {
+    transition: stroke 0.2s; /* Optional: Add transition effect */
+}
+
+.recharts-curve.isAnimationActive path:hover {
+    stroke: purple; /* Change to your desired hover color */
+}

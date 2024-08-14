@@ -1,0 +1,19 @@
+.ai-code p {
+    margin-bottom: 10px;
+}
+
+.ai-code ol ul {
+    list-style: auto;
+    padding: 0 15px;
+    margin: 15px;
+}
+
+.ai-code li {
+    margin: 10px 0;
+}
+
+.ai-code code {
+    border-radius: 10px;
+    margin-bottom: 13px;
+    font-size: 15px;
+}

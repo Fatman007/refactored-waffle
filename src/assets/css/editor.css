@@ -1,0 +1,28 @@
+.ql-container.ql-snow {
+    border: none !important;
+}
+
+.ql-toolbar.ql-snow {
+    border: 1px solid #f4f4f4 !important;
+    padding: 12px !important;
+    border-radius: 10px !important;
+    margin-top: 10px !important;
+}
+
+.ql-editor {
+    height: calc(100vh - 280px)  !important;
+}
+
+.ql-container.ql-snow p {
+    font-size: 16px !important;
+    color: #5d5c5c !important;
+    font-family: 'Gordita', sans-serif !important;
+}
+
+.ql-snow.ql-toolbar button:hover, .ql-snow .ql-toolbar button:hover, .ql-snow.ql-toolbar button:focus, .ql-snow .ql-toolbar button:focus, .ql-snow.ql-toolbar button.ql-active, .ql-snow .ql-toolbar button.ql-active, .ql-snow.ql-toolbar .ql-picker-label:hover, .ql-snow .ql-toolbar .ql-picker-label:hover, .ql-snow.ql-toolbar .ql-picker-label.ql-active, .ql-snow .ql-toolbar .ql-picker-label.ql-active, .ql-snow.ql-toolbar .ql-picker-item:hover, .ql-snow .ql-toolbar .ql-picker-item:hover, .ql-snow.ql-toolbar .ql-picker-item.ql-selected, .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+    color: #8b5cf6 !important;
+}
+
+.ql-snow.ql-toolbar .ql-formats svg  {
+    color: #8b5cf6 !important;
+}

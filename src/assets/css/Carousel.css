@@ -1,0 +1,47 @@
+/* YourCarouselComponent.css */
+.carousel-container {
+    overflow: hidden;
+    position: relative; /* Necessary for centerMode */
+  }
+
+  .carousel-left-to-right .slick-track {
+    display: flex;
+    animation: smoothScrollLeftToRight 35s linear infinite;
+  }
+
+  .carousel-right-to-left .slick-track {
+    display: flex;
+    animation: smoothScrollRightToLeft 35s linear infinite;
+  }
+
+  .carousel-item {
+    flex: 0 0 auto;
+    width: 270px; /* Adjust this value based on your item width */
+    margin-right: 1rem; /* Adjust margin as needed */
+  }
+
+.template-carousel .slick-initialized .slick-slide {
+    height: auto;
+}
+
+.template-carousel .slick-initialized .slick-slide div {
+    height: 100%;
+}
+
+  @keyframes smoothScrollLeftToRight {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes smoothScrollRightToLeft {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
