@@ -107,6 +107,7 @@ export default function Sidebar({ auth, logo, mobileMenu, mobileClose }) {
     return (
         <>
             <div
+                style={{ display: "flex", flexDirection: "column" }}
                 className={`bg-white 2xl:sidebar xl:w-1/5 lg:w-22p md:w-2/6 sm:w-2/5 xs:w-full md:p-3 2xl:left-0 xl:left-0 lg:left-0 md:transition md:delay-150 2xl:p-0 xl:p-0 lg:p-0 sm:p-5 xs:p-5 md:fixed md:bottom-0 sm:fixed sm:bottom-0 sm:top-0 sm:h-full xs:fixed xs:top-0 xs:bottom-0 xs:h-full z-40 2xl:fixed xl:fixed lg:fixed h-screen overflow-y-scroll hide-scrollbar ${mobileMenu ? "md:-left-0 sm:left-0 xs:left-0" : "md:-left-96 sm:-left-500 xs:left-150p"}`}
             >
                 <button
@@ -363,7 +364,25 @@ export default function Sidebar({ auth, logo, mobileMenu, mobileClose }) {
                         </div>
                     </div>
                 </div> */}
+                <div className="mt-auto">
+                    <UserCard initials="JM" name="Jatis Mobile" />
+                </div>
             </div>
         </>
     );
 }
+
+const UserCard = ({ initials, name }) => (
+    <div className="flex flex-col font-semibold rounded-none">
+        <div className="flex gap-3 px-3 py-2 rounded-md bg-neutral-100">
+            <UserAvatar initials={initials} />
+            <div className="grow shrink my-auto text-xs text-black">{name}</div>
+        </div>
+    </div>
+);
+
+const UserAvatar = ({ initials }) => (
+    <div className="px-2.5 text-lg text-white whitespace-nowrap rounded-full bg-zinc-300 h-[41px] w-[41px] flex items-center justify-center">
+        {initials}
+    </div>
+);

@@ -27,6 +27,9 @@ import Tooltip from "../../../Components/Tooltip";
 import UploadArea from "./UploadArea";
 import UrlInput from "./UrlInput";
 import SummaryChatBot from "./SummaryChatBot";
+import ChatHeader from "./ChatHeader";
+import ChatMessage from "./ChatMessage";
+import ChatInput from "./ChatInput";
 import { ModalDelete, ModalRefreshApi, ModalChatbot } from "../ModalDashboard";
 
 import infoIcon from "../../../../assets/frontend/img/info.svg";
@@ -122,7 +125,6 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
     ];
 
     const [t] = useTranslation("global");
-    let isEmptyChatbot = false;
 
     const [scrollPosition, setScrollPosition] = useState(0);
     const [categoryId, setCategoryId] = useState(1);
@@ -157,7 +159,7 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
             case 1:
                 return (
                     <div className="flex flex-row self-end">
-                        <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
+                        {/* <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
                             <UilSearch
                                 className="absolute top-1/2 left-2 y-middle icon-color"
                                 size={15}
@@ -170,10 +172,10 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
                                 aria-label="Search"
                                 style={{ height: 30 }}
                             />
-                        </form>
+                        </form> */}
                         <button
                             style={{
-                                height: 30,
+                                height: 35,
                                 color: "var(--gradient-green-color-1)",
                                 textOverflow: "ellipsis",
                                 fontSize: 12,
@@ -274,109 +276,97 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
     return (
         <>
             <App auth={auth?.user} logo={logo}>
-                {isEmptyChatbot ? (
-                    <div className="flex items-center justify-center h-screen p-8">
-                        <div className="flex flex-col items-center justify-center w-full">
-                            <img
-                                src={iconDownload}
-                                className="mb-9"
-                                alt="Download Icon"
-                                width={100}
-                                height={100}
-                            />
-                            <h2 className="text-2xl font-bold text-gray-800 mb-3 text-center">
-                                Subscribe to Access LLM API
-                            </h2>
-                            <p className="text-gray-600 text-center mb-9">
-                                Unlock the full potential of your messaging
-                                system by subscribing to our LLM API.
-                            </p>
-                            <button
-                                onClick={() => {}}
-                                className="subscribe-button transition duration-300"
-                            >
-                                SUBSCRIBE NOW
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="p-8 flex flex-col">
-                        <div className="flex md:flex xs:block items-center justify-between space-x-5 md:space-x-5 xs:space-x-0">
-                            <div className="w-2/5 lg:w-2/5 md:w-2/5 xs:w-full md:mb-0 xs:mb-3 flex items-center overflow-hidden relative">
-                                <div className=" absolute right-1px top-0 bottom-0 bg-white flex items-center justify-center my-0.5 rounded-r-xl px-1.5">
-                                    <button onClick={handleScrollRight}>
-                                        <UilAngleRightB
-                                            size={18}
-                                            className=" text-slate-400"
-                                        />
-                                    </button>
-                                </div>
-                                {scrollPosition > 0 && (
-                                    <div className=" absolute left-1px top-0 bottom-0 bg-white flex items-center justify-center my-0.5 rounded-l-xl px-1.5">
-                                        <button onClick={handleScrollLeft}>
-                                            <UilAngleLeftB
-                                                size={18}
-                                                className=" text-slate-400"
-                                            />
-                                        </button>
-                                    </div>
-                                )}
+                <div className="p-8 flex flex-col">
+                    {[1, 2].map((num) => {
+                        if (num === categoryId) {
+                            return (
                                 <div
-                                    className="scroll-custom-container bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-auto"
-                                    onScroll={handleScroll}
+                                    key={num}
+                                    className="flex md:flex xs:block items-center justify-between space-x-5 md:space-x-5 xs:space-x-0"
                                 >
-                                    <ul
-                                        className="scroll-container px-1.5 py-1.5 rounded-xl bg-white w-full whitespace-nowrap overflow-x-auto min-w-full hide-scrollbar"
-                                        onScroll={handleScroll}
-                                    >
-                                        {categories.map((value, index) => (
-                                            <li
-                                                key={index}
-                                                onClick={() =>
-                                                    setCategoryId(value.id)
-                                                }
-                                                className="inline-block"
-                                            >
+                                    <div className="w-2/5 lg:w-2/5 md:w-2/5 xs:w-4/5 md:mb-0 xs:mb-3 flex items-center overflow-hidden relative">
+                                        <div className=" absolute right-1px top-0 bottom-0 bg-white flex items-center justify-center my-0.5 rounded-r-xl px-1.5">
+                                            <button onClick={handleScrollRight}>
+                                                <UilAngleRightB
+                                                    size={18}
+                                                    className=" text-slate-400"
+                                                />
+                                            </button>
+                                        </div>
+                                        {scrollPosition > 0 && (
+                                            <div className=" absolute left-1px top-0 bottom-0 bg-white flex items-center justify-center my-0.5 rounded-l-xl px-1.5">
                                                 <button
-                                                    className={`${path?.[0]?.id === value.id ? "bg-gradient text-white" : "text-gray-500"} px-6 py-1.5 rounded-lg`}
+                                                    onClick={handleScrollLeft}
                                                 >
-                                                    {value.name}
+                                                    <UilAngleLeftB
+                                                        size={18}
+                                                        className=" text-slate-400"
+                                                    />
                                                 </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center pb-4 pt-10">
-                            <div>
-                                <h1 className="text-xl font-semibold text-334155">
-                                    {path?.[path?.length - 1]?.name}
-                                </h1>
-                                <p
-                                    style={{ cursor: "pointer" }}
-                                    className="text-[color:var(--primary-green-color)]"
-                                >
-                                    <span>LLM API</span>
-                                    {path.map((crumb, index) => (
-                                        <span
-                                            key={crumb.id}
-                                            onClick={() =>
-                                                setCategoryId(crumb.id)
-                                            }
-                                            style={{ cursor: "pointer" }}
+                                            </div>
+                                        )}
+                                        <div
+                                            className="scroll-custom-container bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-auto"
+                                            onScroll={handleScroll}
                                         >
-                                            {" > "}
-                                            {crumb.name}
-                                        </span>
-                                    ))}
-                                </p>
-                            </div>
-                            {renderExtraFieldById()}
+                                            <ul
+                                                className="scroll-container px-1.5 py-1.5 rounded-xl bg-white w-full whitespace-nowrap overflow-x-auto min-w-full hide-scrollbar"
+                                                onScroll={handleScroll}
+                                            >
+                                                {categories.map(
+                                                    (value, index) => (
+                                                        <li
+                                                            key={index}
+                                                            onClick={() =>
+                                                                setCategoryId(
+                                                                    value.id
+                                                                )
+                                                            }
+                                                            className="inline-block"
+                                                        >
+                                                            <button
+                                                                className={`${path?.[0]?.id === value.id ? "bg-gradient text-white" : "text-gray-500"} px-6 py-1.5 rounded-lg`}
+                                                            >
+                                                                {value.name}
+                                                            </button>
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })}
+
+                    <div className="flex justify-between items-center pb-4 pt-10">
+                        <div>
+                            <h1 className="text-xl font-semibold text-334155">
+                                {path?.[path?.length - 1]?.name}
+                            </h1>
+                            <p
+                                style={{ cursor: "pointer" }}
+                                className="text-[color:var(--primary-green-color)]"
+                            >
+                                <span>LLM</span>
+                                {path.map((crumb, index) => (
+                                    <span
+                                        key={crumb.id}
+                                        onClick={() => setCategoryId(crumb.id)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        {" > "}
+                                        {crumb.name}
+                                    </span>
+                                ))}
+                            </p>
                         </div>
-                        {renderContentById(categoryId)}
+                        {renderExtraFieldById()}
                     </div>
-                )}
+                    {renderContentById(categoryId)}
+                </div>
             </App>
         </>
     );
@@ -540,6 +530,65 @@ const ChatbotModalContent = () => {
     );
 };
 
+const ChatInterface = () => {
+    const messages = [
+        { content: "Halo! Ini dengan siapa?", time: "9. 41 AM", isUser: true },
+        {
+            content:
+                "Halo, Kenalin aku Jatinea, asisten yang siap membantu kamu di layanan pelanggan BJTSA. Apakah ada yang ingin kamu tanyakan tentang produk dan layanan kami?",
+            time: "11.14 AM",
+            isUser: false
+        },
+        {
+            content: "Buat remaja ada apa aja ya?",
+            time: "9. 41 AM",
+            isUser: true
+        },
+        {
+            content:
+                "Produk tabungan khusus untuk remaja yang ditawarkan oleh BJTSA adalah BJTSA Savings Remaja. Ini dirancang untuk anak muda Indonesia mulai dari usia 12 tahun hingga 17 tahun.",
+            time: "11.14 AM",
+            isUser: false
+        }
+    ];
+
+    return (
+        <div
+            className="flex flex-col rounded-xl max-w-[320px] xs:self-center md:self-start"
+            style={{
+                height: "60vh",
+                overflowY: "scroll"
+            }}
+        >
+            <div className="flex flex-col justify-center p-px w-full bg-white rounded-xl">
+                <div className="flex relative flex-col pb-5 w-full rounded-xl aspect-[0.573]">
+                    <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/fcf7caae906fa63565976a08c0e5d438ecc538b559763f5eee17a71e88ae8348?placeholderIfAbsent=true&apiKey=c894d7e13beb4ddfbb27cd6a29f48e4d"
+                        className="object-cover absolute inset-0 size-full"
+                        alt="Chat background"
+                    />
+                    <ChatHeader />
+                    <div className="flex relative flex-col items-start px-4 pt-48 mt-5">
+                        <div className="shrink-0 mt-48 max-w-full h-px border border-solid border-zinc-100 w-[282px]" />
+                        <div className="flex z-10 shrink-0 h-px bg-white bg-opacity-0 w-[7px]" />
+                        <div className="flex flex-col self-stretch -mt-48">
+                            {messages.map((message, index) => (
+                                <ChatMessage key={index} {...message} />
+                            ))}
+                        </div>
+                        <div className="z-10 shrink-0 max-w-full h-px border border-solid border-zinc-100 w-[282px]" />
+                        <div className="flex flex-col self-stretch w-full text-xs leading-loose text-neutral-200">
+                            <div className="flex shrink-0 h-px bg-white bg-opacity-0 w-[7px]" />
+                            <ChatInput />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const ChatbotList = ({ pagination, setCategoryId }) => {
     const [showModalDelete, setShowModalDelete] = useState(false);
     const [showModalSetting, setShowModalSetting] = useState(false);
@@ -594,204 +643,216 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
             id: 1,
             chatbotId: "34s9af5e6",
             chatbotName: "PT Transformasi Digital Sukses Bot",
+            model: "NgobrolLLM",
             status: "Inactive"
         },
         {
             id: 2,
             chatbotId: "25ar423pd",
             chatbotName: "JTSMobile Bot",
+            model: "NgobrolLLM",
             status: "Active"
         }
     ];
 
     return (
-        <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-auto mb-10">
-            <div className="overflow-x-auto border bg-white border-slate-100 rounded-xl">
-                <table className="w-full text-left">
-                    <thead className="text-slate-700 font-normal table-bg ">
-                        <tr className=" font-medium">
-                            <td className="px-8 py-6"># ^</td>
-                            <td className="px-3 py-6">Chatbot ID</td>
-                            <td className="px-5 py-6">Chatbot Name</td>
-                            <td className="px-8 py-6">Status</td>
-                            <td className="px-5 py-6">Action</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chatbotData.length > 0 ? (
-                            chatbotData?.map((value, index) => {
-                                return (
-                                    <tr className="bg-white border-b border-slate-50 last:border-none   hover:bg-gray-50 ">
-                                        <td className="px-2 py-4 text-gray-900">
-                                            <h5 className="font-base cursor-pointer justify-center text-gray-500 flex items-center space-x-1">
-                                                {value.id}
-                                            </h5>
-                                        </td>
-                                        <td className="px-2 py-4">
-                                            <h5 className="font-base text-base text-gray-500 flex items-center space-x-1">
-                                                {value.chatbotId}
-                                            </h5>
-                                        </td>
-                                        <td className="px-2 py-4 text-base text-gray-500 font-normal">
-                                            {value.chatbotName}
-                                        </td>
-                                        <td
-                                            className={`px-2 py-4 text-base text-${value.status === "Active" ? "green" : "red"}-500 font-normal`}
-                                        >
-                                            {value.status}
-                                        </td>
-                                        <td className="px-2 py-4 text-gray-600 font-medium">
-                                            <div className=" flex items-center space-x-3">
-                                                <button onClick={() => {}}>
-                                                    <UilChat size={17} />
-                                                </button>
-                                                <button
-                                                    onClick={handleShowSetting}
-                                                >
-                                                    <UilSetting size={17} />
-                                                </button>
-                                                <button
-                                                    onClick={handleShowDelete}
-                                                >
-                                                    <UilTrashAlt size={17} />
-                                                </button>
+        <div className="flex flex-col md:flex-row w-full gap-10">
+            <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-full">
+                <div
+                    style={{ height: "60vh", overflowY: "scroll" }}
+                    className="overflow-x-auto border bg-white border-slate-100 rounded-xl"
+                >
+                    <table className="text-left">
+                        <thead className="text-slate-700 font-normal table-bg ">
+                            <tr className=" font-medium">
+                                <td className="px-3 py-3"></td>
+                                <td className="px-3 py-3">ID</td>
+                                <td className="px-3 py-3">Name</td>
+                                <td className="px-3 py-3">Model</td>
+                                <td className="px-3 py-3">Training Status</td>
+                                <td className="px-3 py-3">Action</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {chatbotData.length > 0 ? (
+                                chatbotData?.map((value, index) => {
+                                    return (
+                                        <tr className="bg-white border-b border-slate-50 last:border-none hover:bg-gray-50 ">
+                                            <td className="px-4 py-4">
+                                                <h5 className="font-base cursor-pointer justify-center text-gray-500 flex items-center space-x-1">
+                                                    {value.id}
+                                                </h5>
+                                            </td>
+                                            <td className="px-2 py-4">
+                                                <h5 className="font-base justify-center text-base text-gray-500 flex items-center space-x-1">
+                                                    {value.chatbotId}
+                                                </h5>
+                                            </td>
+                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                {value.chatbotName}
+                                            </td>
+                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                {value.model}
+                                            </td>
+                                            <td
+                                                className={`px-2 py-4 justify-center text-base text-${value.status === "Active" ? "green" : "red"}-500 font-normal`}
+                                            >
+                                                {value.status}
+                                            </td>
+                                            <td className="px-2 py-4 text-gray-600 font-medium">
+                                                <div className=" flex items-center space-x-3 justify-center">
+                                                    <button
+                                                        onClick={
+                                                            handleShowSetting
+                                                        }
+                                                    >
+                                                        <UilSetting size={17} />
+                                                    </button>
+                                                    <button
+                                                        onClick={
+                                                            handleShowDelete
+                                                        }
+                                                    >
+                                                        <UilTrashAlt
+                                                            size={17}
+                                                        />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                <tr>
+                                    <td
+                                        colSpan="6"
+                                        className="px-8 py-6 text-slate-400 text-center"
+                                    >
+                                        You have no chatbots yet. Chatbots can
+                                        be created using the “Add New Bot”
+                                        button.
+                                    </td>
+                                </tr>
+                            )}
+                            {chatbotData.length > 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={6}
+                                        className="px-8 py-5 table-bg text-right text-sm"
+                                    >
+                                        <div className=" flex items-center justify-end space-x-6">
+                                            <div>
+                                                <span className=" text-gray-500 mr-1">
+                                                    Rows per page:
+                                                </span>{" "}
+                                                <span className=" text-gray-500">
+                                                    {per_page}
+                                                </span>
                                             </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td
-                                    colSpan="2"
-                                    className="px-8 py-6 text-slate-400 text-center"
-                                >
-                                    You have no chatbots yet. Chatbots can be
-                                    created using the “Add New Bot” button.
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        )}
-                        {chatbotData.length > 0 && (
-                            <tr>
-                                <td
-                                    colSpan={6}
-                                    className="px-8 py-5 table-bg text-right text-sm"
-                                >
-                                    <div className=" flex items-center justify-end space-x-6">
-                                        <div>
-                                            <span className=" text-gray-500 mr-1">
-                                                Rows per page:
-                                            </span>{" "}
-                                            <span className=" text-gray-500">
-                                                {per_page}
-                                            </span>
-                                        </div>
-                                        <div className=" text-gray-500 mr-5">
-                                            {form} - {to} of {total}
-                                        </div>
-                                        <div className=" flex items-center">
-                                            {currentPage > 1 ? (
-                                                <Link
-                                                    href={
-                                                        "/user/documents?page=" +
-                                                        (currentPage - 1)
-                                                    }
-                                                >
-                                                    <UilAngleLeft
-                                                        size={25}
-                                                        className={
-                                                            currentPage > 1
-                                                                ? "text-gray-500"
-                                                                : "text-slate-300 pointer-events-none"
+                                            <div className=" text-gray-500 mr-5">
+                                                {form} - {to} of {total}
+                                            </div>
+                                            <div className=" flex items-center">
+                                                {currentPage > 1 ? (
+                                                    <Link
+                                                        href={
+                                                            "/user/documents?page=" +
+                                                            (currentPage - 1)
                                                         }
-                                                    />
-                                                </Link>
-                                            ) : (
-                                                <button className="pointer-events-none">
-                                                    <UilAngleLeft
-                                                        size={25}
-                                                        className={
-                                                            currentPage > 1
-                                                                ? "text-gray-500"
-                                                                : "text-slate-300 pointer-events-none"
-                                                        }
-                                                    />
-                                                </button>
-                                            )}
+                                                    >
+                                                        <UilAngleLeft
+                                                            size={25}
+                                                            className={
+                                                                currentPage > 1
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </Link>
+                                                ) : (
+                                                    <button className="pointer-events-none">
+                                                        <UilAngleLeft
+                                                            size={25}
+                                                            className={
+                                                                currentPage > 1
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </button>
+                                                )}
 
-                                            {to < total ? (
-                                                <Link
-                                                    href={
-                                                        "/user/documents?page=" +
-                                                        (currentPage + 1)
-                                                    }
-                                                >
-                                                    <UilAngleRight
-                                                        size={25}
-                                                        className={
-                                                            to < total
-                                                                ? "text-gray-500"
-                                                                : "text-slate-300 pointer-events-none"
+                                                {to < total ? (
+                                                    <Link
+                                                        href={
+                                                            "/user/documents?page=" +
+                                                            (currentPage + 1)
                                                         }
-                                                    />
-                                                </Link>
-                                            ) : (
-                                                <button className=" pointer-events-none">
-                                                    <UilAngleRight
-                                                        size={25}
-                                                        className={
-                                                            to < total
-                                                                ? "text-gray-500"
-                                                                : "text-slate-300 pointer-events-none"
-                                                        }
-                                                    />
-                                                </button>
-                                            )}
+                                                    >
+                                                        <UilAngleRight
+                                                            size={25}
+                                                            className={
+                                                                to < total
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </Link>
+                                                ) : (
+                                                    <button className=" pointer-events-none">
+                                                        <UilAngleRight
+                                                            size={25}
+                                                            className={
+                                                                to < total
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            <ModalDelete
-                showModal={showModalDelete}
-                handleClose={handleCloseDelete}
-                title=""
-                onShow={handleOnShowDelete}
-                onClose={handleOnCloseDelete}
-                onDelete={() => {}}
-            >
-                <section className="flex flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
-                    <img
-                        src={iconTrash}
-                        className="object-contain mt-16 aspect-[0.88] w-[66px] max-md:mt-10"
-                    />
-                    <h2 className="mt-6 text-2xl font-semibold text-center text-slate-700">
-                        Delete BJTSA Bot
-                    </h2>
-                    <p className="mt-10 text-lg font-medium leading-8 text-center text-gray-500">
-                        Are you sure you want to delete this bot? This action
-                        cannot be undone.
-                    </p>
-                </section>
-            </ModalDelete>
-            <ModalChatbot
-                showModal={showModalSetting}
-                handleClose={handleCloseSetting}
-                title="BJTSA Bot"
-                onShow={handleOnShowSetting}
-                onClose={handleOnCloseSetting}
-            >
-                <div className="px-8 flex overflow-scroll flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
-                    <ChatbotModalContent />
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            </ModalChatbot>
+                <ModalDelete
+                    showModal={showModalDelete}
+                    handleClose={handleCloseDelete}
+                    title=""
+                    onShow={handleOnShowDelete}
+                    onClose={handleOnCloseDelete}
+                    onDelete={() => {}}
+                >
+                    <section className="flex flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
+                        <img
+                            src={iconTrash}
+                            className="object-contain mt-16 aspect-[0.88] w-[66px] max-md:mt-10"
+                        />
+                        <h2 className="mt-6 text-2xl font-semibold text-center text-slate-700">
+                            Delete BJTSA Bot
+                        </h2>
+                        <p className="mt-10 text-lg font-medium leading-8 text-center text-gray-500">
+                            Are you sure you want to delete this bot? This
+                            action cannot be undone.
+                        </p>
+                    </section>
+                </ModalDelete>
+                <ModalChatbot
+                    showModal={showModalSetting}
+                    handleClose={handleCloseSetting}
+                    title="BJTSA Bot"
+                    onShow={handleOnShowSetting}
+                    onClose={handleOnCloseSetting}
+                >
+                    <div className="px-8 flex overflow-scroll flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
+                        <ChatbotModalContent />
+                    </div>
+                </ModalChatbot>
+            </div>
+            <ChatInterface />
         </div>
     );
 };

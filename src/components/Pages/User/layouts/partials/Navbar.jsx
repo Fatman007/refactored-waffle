@@ -300,8 +300,8 @@ export default function Navbar(props) {
                             className="object-contain aspect-square w-[25px]"
                         />
                         {showDropDownGrid && (
-                            <div class="absolute top-8 right-0 mt-0.5 w-48 bg-white rounded-md custom-shadow z-50">
-                                <div className="flex gap-4">
+                            <div class="absolute p-1 top-8 right-0 mt-0.5 w-48 bg-white rounded-md custom-shadow z-50">
+                                <div className="flex gap-2">
                                     <ImageCard
                                         src={accountIcon}
                                         onClick={() => {
@@ -314,7 +314,7 @@ export default function Navbar(props) {
                                         onClick={() => {}}
                                     />
                                 </div>
-                                <div className="flex gap-4 mt-4">
+                                <div className="flex gap-2 mt-4">
                                     <ImageCard
                                         src={broadcastIcon}
                                         onClick={() => {}}
