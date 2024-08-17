@@ -171,7 +171,7 @@ const MainRoute = () => {
             <Switch>
                 {/* <Routes path="/" exact component={Welcome} /> */}
                 <Routes path="/" exact>
-                    <Dashboard logo={logo} documents={{ data: documents }} />
+                    <LLMApi logo={logo} documents={{ data: documents }} />
                 </Routes>
                 {/* <Routes path="/login">
                     <Login logo={logo} />
