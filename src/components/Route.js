@@ -162,10 +162,10 @@ const conversation = {
 
 const MainRoute = () => {
     useEffect(() => {
-        const currentPath = window.location.pathname;
-        if (currentPath === "/" || currentPath === "") {
-            window.location.href = "/user/llm";
-        }
+        // const currentPath = window.location.pathname;
+        // if (currentPath === "/" || currentPath === "") {
+        //     window.location.href = "/user/llm";
+        // }
         // variables.socket = socketIOClient(
         //     process.env.REACT_APP_NODE_BACKEND_URL
         // );
