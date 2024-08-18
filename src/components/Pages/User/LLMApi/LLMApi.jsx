@@ -30,8 +30,15 @@ import SummaryChatBot from "./SummaryChatBot";
 import ChatHeader from "./ChatHeader";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
-import { ModalDelete, ModalRefreshApi, ModalChatbot } from "../ModalDashboard";
+import {
+    ModalDelete,
+    ModalRefreshApi,
+    ModalChatbot,
+    ModalWarningDocument
+} from "../ModalDashboard";
 
+import whatsappBg from "../../../../assets/frontend/img/whatsappbg.png";
+import warningImg from "../../../../assets/frontend/img/warning.png";
 import infoIcon from "../../../../assets/frontend/img/info.svg";
 import iconDownload from "../../../../assets/frontend/img/download.png";
 import iconCopy from "../../../../assets/frontend/img/copy.png";
@@ -41,21 +48,48 @@ import iconFile from "../../../../assets/frontend/img/file.svg";
 import iconLink from "../../../../assets/frontend/img/link.svg";
 import iconTrash from "../../../../assets/frontend/img/trash.svg";
 import iconKey from "../../../../assets/frontend/img/key.svg";
+import iconArrowRight from "../../../../assets/frontend/img/arrow-right-circle.svg";
+import iconArrowGrayRight from "../../../../assets/frontend/img/arrow-right-circle-gray.svg";
+import iconArrowLeft from "../../../../assets/frontend/img/arrow-left-circle.svg";
+import iconArrowGrayLeft from "../../../../assets/frontend/img/arrow-left-circle-gray.svg";
+import iconLoading from "../../../../assets/frontend/img/loading.svg";
+import iconDownloadIcon from "../../../../assets/frontend/img/downloadicon.svg";
+import iconNewtab from "../../../../assets/frontend/img/newtab.svg";
 
 // Helper function to find the full path to a category
-const findCategoryPath = (categories, targetId) => {
+// const findCategoryPath = (categories, targetId) => {
+//     for (const category of categories) {
+//         if (category.id === targetId) {
+//             return [category];
+//         }
+//         if (category.categories && category.categories.length > 0) {
+//             const childPath = findCategoryPath(category.categories, targetId);
+//             if (childPath) {
+//                 // Include all categories up to and including the found child
+//                 const index = category.categories.findIndex(
+//                     (c) => c.id === targetId
+//                 );
+//                 return [category, ...category.categories.slice(0, index + 1)];
+//             }
+//         }
+//     }
+//     return null;
+// };
+
+const findCategoryPath = (categories, targetId, currentPath = []) => {
     for (const category of categories) {
+        const newPath = [...currentPath, category];
         if (category.id === targetId) {
-            return [category];
+            return newPath;
         }
         if (category.categories && category.categories.length > 0) {
-            const childPath = findCategoryPath(category.categories, targetId);
-            if (childPath) {
-                // Include all categories up to and including the found child
-                const index = category.categories.findIndex(
-                    (c) => c.id === targetId
-                );
-                return [category, ...category.categories.slice(0, index + 1)];
+            const subPath = findCategoryPath(
+                category.categories,
+                targetId,
+                newPath
+            );
+            if (subPath) {
+                return subPath;
             }
         }
     }
@@ -90,7 +124,7 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
             categories: [
                 {
                     id: 5,
-                    name: "Create Bot"
+                    name: "Add New Bot"
                 },
                 {
                     id: 6,
@@ -99,6 +133,10 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
                 {
                     id: 7,
                     name: "Summary"
+                },
+                {
+                    id: 8,
+                    name: "Settings"
                 }
             ]
         },
@@ -107,7 +145,7 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
             name: "Documents Management",
             categories: [
                 {
-                    id: 8,
+                    id: 9,
                     name: "Add New Document"
                 }
             ]
@@ -128,6 +166,7 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
 
     const [scrollPosition, setScrollPosition] = useState(0);
     const [categoryId, setCategoryId] = useState(1);
+    const [settingBotName, setSettingBotName] = useState("BJTSA Bot");
 
     // Find the path for the selected category ID
     const path = findCategoryPath(categories, categoryId);
@@ -136,6 +175,8 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
         switch (categoryId) {
             case 1:
                 return <ChatbotList setCategoryId={setCategoryId} />;
+            case 2:
+                return <DocumentList setCategoryId={setCategoryId} />;
             case 3:
                 return (
                     <ApiKeyComponent
@@ -149,6 +190,12 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
                 return <DocumentUpload setCategoryId={setCategoryId} />;
             case 7:
                 return <SummaryChatBot setCategoryId={setCategoryId} />;
+            case 8:
+                return <SettingsContent setCategoryId={setCategoryId} />;
+            case 9:
+                return (
+                    <DocumentUploadManagement setCategoryId={setCategoryId} />
+                );
             default:
                 return null;
         }
@@ -159,20 +206,6 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
             case 1:
                 return (
                     <div className="flex flex-row self-end">
-                        {/* <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
-                            <UilSearch
-                                className="absolute top-1/2 left-2 y-middle icon-color"
-                                size={15}
-                            />
-                            <input
-                                id="searchInput"
-                                type="search"
-                                placeholder={"search"}
-                                className="px-7 w-full bg-white rounded-md border-none"
-                                aria-label="Search"
-                                style={{ height: 30 }}
-                            />
-                        </form> */}
                         <button
                             style={{
                                 height: 35,
@@ -218,6 +251,52 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
                             className="unsubscribe-button transition duration-300 ml-10"
                         >
                             UNSUBSCRIBE
+                        </button>
+                    </div>
+                );
+            case 2:
+                return (
+                    <div className="flex flex-row self-end">
+                        <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
+                            <UilSearch
+                                className="absolute top-1/2 left-2 y-middle icon-color"
+                                size={15}
+                            />
+                            <input
+                                id="searchInput"
+                                type="search"
+                                placeholder={"search"}
+                                className="px-7 w-full bg-white rounded-md border-none"
+                                aria-label="Search"
+                                style={{ height: 35 }}
+                            />
+                        </form>
+                        <button
+                            style={{
+                                height: 35,
+                                color: "var(--gradient-green-color-1)",
+                                textOverflow: "ellipsis",
+                                fontSize: 12,
+                                minWidth: 120
+                            }}
+                            onClick={() => setCategoryId(9)}
+                            className="subscribe-button transition duration-300 ml-5 flex flex-row items-center"
+                        >
+                            <div
+                                style={{
+                                    height: 15,
+                                    width: 15,
+                                    borderRadius: 7.5,
+                                    borderColor:
+                                        "var(--gradient-green-color-1)",
+                                    borderStyle: "solid",
+                                    borderWidth: 1,
+                                    marginRight: 3
+                                }}
+                            >
+                                <UilPlus className="" size={13} />
+                            </div>
+                            ADD NEW DOCUMENT
                         </button>
                     </div>
                 );
@@ -341,10 +420,12 @@ export default function LLMApi({ auth, logo, documents, pagination }) {
                         return null;
                     })}
 
-                    <div className="flex justify-between items-center pb-4 pt-10">
+                    <div className="flex justify-between items-center pb-4 pt-4">
                         <div>
                             <h1 className="text-xl font-semibold text-334155">
                                 {path?.[path?.length - 1]?.name}
+                                {"   "}
+                                {categoryId === 8 && settingBotName}
                             </h1>
                             <p
                                 style={{ cursor: "pointer" }}
@@ -465,40 +546,789 @@ const ApiKeyComponent = ({ apiKeyInitial, setCategoryId }) => {
     );
 };
 
-const ChatbotModalContent = () => {
+const InputField = ({
+    label,
+    placeholder,
+    disabled,
+    required,
+    type = "text"
+}) => (
+    <div className="mb-6 flex items-center">
+        <label className="w-1/3 text-gray-700 text-sm font-bold mr-4 text-left">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+        </label>
+        {disabled ? (
+            <input
+                disabled
+                type={type}
+                placeholder={placeholder}
+                style={{ background: "none" }}
+                className="appearance-none border-none w-full py-2 px-3 text-gray-700 leading-tight"
+                required={required}
+            />
+        ) : (
+            <input
+                type={type}
+                placeholder={placeholder}
+                className="appearance-none border-teal-important border-teal-600 rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                required={required}
+            />
+        )}
+    </div>
+);
+
+const SelectField = ({ label, required, children }) => (
+    <div className="mb-6 flex items-center">
+        <label className="w-1/3 text-gray-700 text-sm font-bold mr-4 text-left">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+        </label>
+        <select
+            className="appearance-none border-teal-important border-teal-600 rounded w-full py-2 px-3 text-gray-700 leading-tight"
+            required
+        >
+            {children}
+        </select>
+    </div>
+);
+
+const TextAreaField = ({ label, placeholder, required }) => (
+    <div className="mb-6 flex items-start">
+        <label className="w-1/3 text-gray-700 text-sm font-bold mr-4 text-left mt-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+        </label>
+        <textarea
+            placeholder={placeholder}
+            className="appearance-none border-teal-important border-teal-600 rounded w-full py-2 px-3 text-gray-700 leading-tight"
+            rows="4"
+            required
+        />
+    </div>
+);
+
+const ChatbotForm = () => {
+    const characterOptions = [
+        {
+            label: "Formal and Professional",
+            isSelected: true,
+            toolTipText:
+                "e.g. “Good afternoon, regarding the problem you are experiencing, we will help you find a solution.”"
+        },
+        {
+            label: "Casual and Conversational",
+            isSelected: false,
+            toolTipText: "e.g. “Hi, how can I help you today?”"
+        },
+        {
+            label: "Direct and Instructive",
+            isSelected: false,
+            toolTipText: "e.g. “For this issue, you can follow these steps.”"
+        },
+        {
+            label: "Friendly and Empathetic",
+            isSelected: false,
+            toolTipText:
+                "e.g. “I understand the problem you are facing, let me try to help you find a solution.”"
+        },
+        {
+            label: "Fun and Playful",
+            isSelected: false,
+            toolTipText:
+                "e.g. “Wow, that's a great question! Let me try to help you so you don't have to worry about it.”"
+        }
+    ];
+
+    return (
+        <form className="w-full mt-8">
+            <InputField label="Chatbot Name" placeholder="BJTSA Bot" required />
+            <InputField
+                disabled
+                label="Model Used"
+                placeholder="NgobrolLLM"
+                required
+            />
+            <SelectField label="Character Response" required>
+                {characterOptions.map((option, index) => (
+                    <option key={index} value={option.label}>
+                        {option.label}
+                    </option>
+                ))}
+            </SelectField>
+            <TextAreaField
+                label="Chatbot Instructions"
+                placeholder="This is a bot used for banking customer service. Please be kind and direct to your customers."
+                required
+            />
+        </form>
+    );
+};
+
+const ChatbotDocumentSetting = ({ pagination, setCategoryId }) => {
+    const {
+        per_page,
+        currentPage,
+        form,
+        lastPage,
+        next_page_url,
+        prev_page_url,
+        to,
+        total
+    } = pagination ?? {
+        per_page: null,
+        currentPage: null,
+        form: null,
+        lastPage: null,
+        next_page_url: null,
+        prev_page_url: null,
+        to: null,
+        total: null
+    };
+
+    const [canScroll, setCanScroll] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showModalWarning, setShowModalWarning] = useState(false);
+
+    const handleShowWarning = () => setShowModalWarning(true);
+    const handleCloseWarning = () => setShowModalWarning(false);
+
+    const handleOnShowWarning = () => {
+        console.log("Modal is now shown");
+        // Additional logic when the modal is shown
+    };
+
+    const handleOnCloseWarning = () => {
+        console.log("Modal is now hidden");
+        // Additional logic when the modal is hidden
+    };
+
+    const canScrollDown = (element) => {
+        return element?.scrollHeight > element?.clientHeight;
+    };
+
+    const onPressNextPage = () => {};
+
+    const onPressPrevPage = () => {};
+
+    const allDocuments = [
+        { id: "1234as342", name: "Bank Jatis Financial S...", type: "file" },
+        { id: "71rt62j49", name: "produk.com/ikn/jtms", type: "doc" }
+    ];
+
+    const activeDocuments = [
+        { id: "qw3rt13h7", name: "Bank Jatis Financial S...", type: "file" },
+        { id: "3gfog399", name: "produk.com/ikn/jtms", type: "doc" }
+    ];
+
+    const onPressContinue = () => {
+        handleShowWarning();
+    };
+
+    const onPressCancel = () => {
+        setCategoryId(1);
+        window?.scrollTo(0, 0);
+    };
+
+    return (
+        <main className="flex flex-col">
+            <section className="mt-3.5 w-full max-md:max-w-full">
+                <div className="flex gap-5 max-md:flex-col mt-8">
+                    <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
+                        <div className="flex flex-row pb-4">
+                            <h2
+                                style={{
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    width: "100%"
+                                }}
+                                className="grow shrink my-auto text-2xl font-medium text-gray-700 w-[111px]"
+                            >
+                                All Document
+                            </h2>
+                            <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
+                                <UilSearch
+                                    className="absolute top-1/2 left-2 y-middle icon-color"
+                                    size={15}
+                                />
+                                <input
+                                    id="searchInput"
+                                    type="search"
+                                    placeholder={"search"}
+                                    className="px-7 w-full bg-white rounded-md border-none"
+                                    aria-label="Search"
+                                    style={{ height: 30 }}
+                                />
+                            </form>
+                        </div>
+                        <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-full">
+                            <div
+                                onScroll={() => {
+                                    setCanScroll(
+                                        canScrollDown(
+                                            document.querySelector(
+                                                ".scrolling-table"
+                                            )
+                                        )
+                                    );
+                                }}
+                                style={{
+                                    height: "60vh",
+                                    overflowY: "scroll",
+                                    position: "relative",
+                                    width: "100%"
+                                }}
+                                className="border bg-white border-slate-100 rounded-xl scrolling-table"
+                            >
+                                <table className=" text-left w-full">
+                                    <thead
+                                        style={{
+                                            position: "sticky",
+                                            top: 0
+                                        }}
+                                        className="text-slate-700 font-normal table-bg "
+                                    >
+                                        <tr className=" font-medium">
+                                            <td className="px-3 py-3"></td>
+                                            <td className="px-3 py-3">ID</td>
+                                            <td className="px-3 py-3">Name</td>
+                                            <td className="px-3 py-3">Type</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {allDocuments.length > 0 ? (
+                                            allDocuments?.map(
+                                                (value, index) => {
+                                                    return (
+                                                        <tr
+                                                            key={index}
+                                                            className="bg-white border-b border-slate-50 last:border-none hover:bg-gray-50 "
+                                                        >
+                                                            <td className=" py-4">
+                                                                <div
+                                                                    onClick={() => {}}
+                                                                    className="font-base cursor-pointer justify-center text-gray-500 flex items-center space-x-1"
+                                                                >
+                                                                    {isLoading ? (
+                                                                        <img
+                                                                            src={
+                                                                                iconArrowGrayRight
+                                                                            }
+                                                                            alt=""
+                                                                            className="object-contain w-5 aspect-square"
+                                                                        />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={
+                                                                                iconArrowRight
+                                                                            }
+                                                                            alt=""
+                                                                            className="object-contain w-5 aspect-square"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-2 py-4">
+                                                                <h5 className="font-base justify-center text-base text-gray-500 flex items-center space-x-1">
+                                                                    {value.id}
+                                                                </h5>
+                                                            </td>
+                                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                                {value.name}
+                                                            </td>
+                                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                                {value.type ===
+                                                                "file" ? (
+                                                                    <img
+                                                                        src={
+                                                                            iconFile
+                                                                        }
+                                                                        alt=""
+                                                                        className="object-contain w-5 aspect-square"
+                                                                    />
+                                                                ) : (
+                                                                    <img
+                                                                        src={
+                                                                            iconLink
+                                                                        }
+                                                                        alt=""
+                                                                        className="object-contain w-5 aspect-square"
+                                                                    />
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )
+                                        ) : (
+                                            <tr>
+                                                <td
+                                                    colSpan="6"
+                                                    className="px-8 py-6 text-slate-400 text-center"
+                                                >
+                                                    You have no chatbots yet.
+                                                    Chatbots can be created
+                                                    using the “Add New Bot”
+                                                    button.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div
+                                    className="bg-white py-6 pr-6 rounded-b-xl"
+                                    style={{
+                                        position: canScroll
+                                            ? "sticky"
+                                            : "absolute",
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        width: "100%"
+                                    }}
+                                >
+                                    <div className=" flex items-center justify-end space-x-6">
+                                        <div>
+                                            <span className=" text-gray-500 mr-1">
+                                                Rows per page:
+                                            </span>{" "}
+                                            <span className=" text-gray-500">
+                                                {per_page}
+                                            </span>
+                                        </div>
+                                        <div className=" text-gray-500 mr-5">
+                                            {form} - {to} of {total}
+                                        </div>
+                                        <div className=" flex items-center">
+                                            {currentPage > 1 ? (
+                                                <div
+                                                    className=" cursor-pointer"
+                                                    onClick={onPressPrevPage}
+                                                >
+                                                    <UilAngleLeft
+                                                        size={25}
+                                                        className={
+                                                            currentPage > 1
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <button className="pointer-events-none">
+                                                    <UilAngleLeft
+                                                        size={25}
+                                                        className={
+                                                            currentPage > 1
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </button>
+                                            )}
+
+                                            {to < total ? (
+                                                <div
+                                                    className=" cursor-pointer"
+                                                    onClick={onPressNextPage}
+                                                >
+                                                    <UilAngleRight
+                                                        size={25}
+                                                        className={
+                                                            to < total
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <button className=" pointer-events-none">
+                                                    <UilAngleRight
+                                                        size={25}
+                                                        className={
+                                                            to < total
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
+                        <div className="flex flex-row pb-4">
+                            <h2
+                                style={{
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    width: "100%"
+                                }}
+                                className="grow shrink my-auto text-2xl font-medium text-gray-700 w-[111px]"
+                            >
+                                Active Document
+                            </h2>
+                            <form className="text-base text-gray-700 relative max-w-[200px] rounded-md bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)]">
+                                <UilSearch
+                                    className="absolute top-1/2 left-2 y-middle icon-color"
+                                    size={15}
+                                />
+                                <input
+                                    id="searchInput"
+                                    type="search"
+                                    placeholder={"search"}
+                                    className="px-7 w-full bg-white rounded-md border-none"
+                                    aria-label="Search"
+                                    style={{ height: 30 }}
+                                />
+                            </form>
+                        </div>
+                        <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-full">
+                            <div
+                                onScroll={() => {
+                                    setCanScroll(
+                                        canScrollDown(
+                                            document.querySelector(
+                                                ".scrolling-table"
+                                            )
+                                        )
+                                    );
+                                }}
+                                style={{
+                                    height: "60vh",
+                                    overflowY: "scroll",
+                                    position: "relative",
+                                    width: "100%"
+                                }}
+                                className="border bg-white border-slate-100 rounded-xl scrolling-table"
+                            >
+                                <table className=" text-left w-full">
+                                    <thead
+                                        style={{
+                                            position: "sticky",
+                                            top: 0
+                                        }}
+                                        className="text-slate-700 font-normal table-bg "
+                                    >
+                                        <tr className=" font-medium">
+                                            <td className="px-3 py-3"></td>
+                                            <td className="px-3 py-3">ID</td>
+                                            <td className="px-3 py-3">Name</td>
+                                            <td className="px-3 py-3">Type</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {activeDocuments.length > 0 ? (
+                                            activeDocuments?.map(
+                                                (value, index) => {
+                                                    return (
+                                                        <tr
+                                                            key={index}
+                                                            className="bg-white border-b border-slate-50 last:border-none hover:bg-gray-50 "
+                                                        >
+                                                            <td className="py-4">
+                                                                <div
+                                                                    onClick={() => {}}
+                                                                    className="font-base cursor-pointer justify-center text-gray-500 flex items-center space-x-1"
+                                                                >
+                                                                    {isLoading ? (
+                                                                        <img
+                                                                            src={
+                                                                                iconArrowGrayLeft
+                                                                            }
+                                                                            alt=""
+                                                                            className="object-contain w-5 aspect-square"
+                                                                        />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={
+                                                                                iconArrowLeft
+                                                                            }
+                                                                            alt=""
+                                                                            className="object-contain w-5 aspect-square"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-2 py-4">
+                                                                <h5 className="font-base justify-center text-base text-gray-500 flex items-center space-x-1">
+                                                                    {value.id}
+                                                                </h5>
+                                                            </td>
+                                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                                {value.name}
+                                                            </td>
+                                                            <td className="px-2 py-4 justify-center text-base text-gray-500 font-normal">
+                                                                {value.type ===
+                                                                "file" ? (
+                                                                    <img
+                                                                        src={
+                                                                            iconFile
+                                                                        }
+                                                                        alt=""
+                                                                        className="object-contain w-5 aspect-square"
+                                                                    />
+                                                                ) : (
+                                                                    <img
+                                                                        src={
+                                                                            iconLink
+                                                                        }
+                                                                        alt=""
+                                                                        className="object-contain w-5 aspect-square"
+                                                                    />
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )
+                                        ) : (
+                                            <tr>
+                                                <td
+                                                    colSpan="6"
+                                                    className="px-8 py-6 text-slate-400 text-center"
+                                                >
+                                                    You have no chatbots yet.
+                                                    Chatbots can be created
+                                                    using the “Add New Bot”
+                                                    button.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                                <div
+                                    className="bg-white py-6 pr-6 rounded-b-xl"
+                                    style={{
+                                        position: canScroll
+                                            ? "sticky"
+                                            : "absolute",
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        width: "100%"
+                                    }}
+                                >
+                                    <div className=" flex items-center justify-end space-x-6">
+                                        <div>
+                                            <span className=" text-gray-500 mr-1">
+                                                Rows per page:
+                                            </span>{" "}
+                                            <span className=" text-gray-500">
+                                                {per_page}
+                                            </span>
+                                        </div>
+                                        <div className=" text-gray-500 mr-5">
+                                            {form} - {to} of {total}
+                                        </div>
+                                        <div className=" flex items-center">
+                                            {currentPage > 1 ? (
+                                                <div
+                                                    className=" cursor-pointer"
+                                                    onClick={onPressPrevPage}
+                                                >
+                                                    <UilAngleLeft
+                                                        size={25}
+                                                        className={
+                                                            currentPage > 1
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <button className="pointer-events-none">
+                                                    <UilAngleLeft
+                                                        size={25}
+                                                        className={
+                                                            currentPage > 1
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </button>
+                                            )}
+
+                                            {to < total ? (
+                                                <div
+                                                    className=" cursor-pointer"
+                                                    onClick={onPressNextPage}
+                                                >
+                                                    <UilAngleRight
+                                                        size={25}
+                                                        className={
+                                                            to < total
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <button className=" pointer-events-none">
+                                                    <UilAngleRight
+                                                        size={25}
+                                                        className={
+                                                            to < total
+                                                                ? "text-gray-500"
+                                                                : "text-slate-300 pointer-events-none"
+                                                        }
+                                                    />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex justify-between mt-14">
+                    {isLoading ? (
+                        <div
+                            style={{
+                                maxWidth: "50%",
+                                textOverflow: "ellipsis",
+                                overflow: "hidden"
+                            }}
+                            className="flex gap-2 items-center text-sm font-medium leading-none text-center whitespace-nowrap text-slate-600"
+                        >
+                            <img
+                                src={iconLoading}
+                                className="object-contain animate-spin shrink-0 self-stretch my-auto aspect-[0.94] w-[15px]"
+                                alt="visibility"
+                            />
+                            Please wait while your document is uploading....
+                        </div>
+                    ) : (
+                        <div className="flex gap-2 items-center text-sm font-medium leading-none text-center whitespace-nowrap text-slate-600"></div>
+                    )}
+
+                    <div className="flex gap-2 text-sm font-medium leading-none text-center whitespace-nowrap text-slate-600">
+                        <BottomButton
+                            onPress={onPressCancel}
+                            disabled={false}
+                            variant="text"
+                            label="Cancel"
+                        />
+                        <BottomButton
+                            onPress={onPressContinue}
+                            disabled={false}
+                            variant="primary"
+                            label="Submit"
+                        />
+                    </div>
+                </div>
+            </section>
+            <ModalWarningDocument
+                showModal={showModalWarning}
+                handleClose={handleCloseWarning}
+                title=""
+                onShow={handleOnShowWarning}
+                onClose={handleOnCloseWarning}
+                onContinue={() => {
+                    setIsLoading(true);
+                    handleCloseWarning();
+                }}
+            >
+                <section className="flex flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
+                    <img
+                        src={warningImg}
+                        className="object-contain mt-16 aspect-[0.88] w-[66px] max-md:mt-10"
+                    />
+                    <h2 className="mt-6 text-2xl font-semibold text-center text-slate-700">
+                        Update Document List
+                    </h2>
+                    <p className="mt-10 text-lg font-medium leading-8 text-center text-gray-500">
+                        Are you sure you want to update your document list?
+                    </p>
+                </section>
+            </ModalWarningDocument>
+        </main>
+    );
+};
+
+const SettingsContent = ({ setCategoryId }) => {
     let categories = [
         {
             id: 1,
-            name: "Edit Details",
+            name: "Chatbot Profile",
             categories: []
         },
         {
             id: 2,
-            name: "My Documents",
-            categories: []
-        },
-        {
-            id: 3,
-            name: "API Key",
+            name: "List Document",
             categories: []
         }
     ];
-    const [categoryId, setCategoryId] = useState(1);
+    const [categoryIdSetting, setCategoryIdSetting] = useState(1);
+
+    const onPressContinue = () => {
+        // if (name?.length === 0) {
+        //     toast("Please add chatbot name first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else if (model?.length === 0) {
+        //     toast("Please choose chatbot model first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else if (response?.length === 0) {
+        //     toast("Please choose chatbot response first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else if (instruction?.length === 0) {
+        //     toast("Please add chatbot instruction first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else {
+        //     setCategoryId(6);
+        //     window?.scrollTo(0, 0);
+        // }
+    };
+
+    const onPressCancel = () => {
+        setCategoryId(1);
+        window?.scrollTo(0, 0);
+    };
 
     const renderContentById = (categoryId) => {
         switch (categoryId) {
             case 1:
-                return null;
+                return (
+                    <div className="px-8">
+                        <ApiKeyComponent
+                            apiKeyInitial="12345678s"
+                            setCategoryId={setCategoryId}
+                        />
+                        <ChatbotForm />
+                        <div
+                            style={{ right: 0 }}
+                            className="flex gap-2 justify-end mt-14 text-sm font-medium leading-none text-center whitespace-nowrap text-slate-600 max-md:mt-10"
+                        >
+                            <BottomButton
+                                onPress={onPressCancel}
+                                disabled={false}
+                                variant="text"
+                                label="Cancel"
+                            />
+                            <BottomButton
+                                onPress={onPressContinue}
+                                disabled={false}
+                                variant="primary"
+                                label="Submit"
+                            />
+                        </div>
+                    </div>
+                );
 
             case 2:
-                return null;
-            case 3:
-                return (
-                    <ApiKeyComponent
-                        apiKeyInitial="12345678s"
-                        setCategoryId={setCategoryId}
-                    />
-                );
+                return <ChatbotDocumentSetting setCategoryId={setCategoryId} />;
             default:
                 return null;
         }
@@ -506,17 +1336,17 @@ const ChatbotModalContent = () => {
 
     return (
         <>
-            <div className="w-1/2 lg:w-1/2 md:w-1/2 xs:w-full md:mb-0 xs:mb-3 flex items-center overflow-hidden relative">
+            <div className="md:mb-0 xs:mb-3 flex self-center items-center overflow-hidden relative">
                 <div className="scroll-custom-container bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-auto">
                     <ul className="scroll-container px-1.5 py-1.5 rounded-xl bg-white w-full whitespace-nowrap overflow-x-auto min-w-full hide-scrollbar">
                         {categories.map((value, index) => (
                             <li
                                 key={index}
-                                onClick={() => setCategoryId(value.id)}
+                                onClick={() => setCategoryIdSetting(value.id)}
                                 className="inline-block"
                             >
                                 <button
-                                    className={`${categoryId === value.id ? "bg-gradient text-white" : "text-gray-500"} px-6 py-1.5 rounded-lg`}
+                                    className={`${categoryIdSetting === value.id ? "bg-gradient text-white" : "text-gray-500"} px-6 py-1.5 rounded-lg`}
                                 >
                                     {value.name}
                                 </button>
@@ -525,7 +1355,7 @@ const ChatbotModalContent = () => {
                     </ul>
                 </div>
             </div>
-            {renderContentById(categoryId)}
+            {renderContentById(categoryIdSetting)}
         </>
     );
 };
@@ -554,7 +1384,7 @@ const ChatInterface = () => {
 
     return (
         <div
-            className="flex flex-col rounded-xl max-w-[320px] xs:self-center md:self-start"
+            className="flex flex-col rounded-xl max-w-[320px] min-w-[320px] xs:self-center xl:self-start"
             style={{
                 height: "60vh",
                 overflowY: "scroll"
@@ -563,23 +1393,18 @@ const ChatInterface = () => {
             <div className="flex flex-col justify-center p-px w-full bg-white rounded-xl">
                 <div className="flex relative flex-col pb-5 w-full rounded-xl aspect-[0.573]">
                     <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/fcf7caae906fa63565976a08c0e5d438ecc538b559763f5eee17a71e88ae8348?placeholderIfAbsent=true&apiKey=c894d7e13beb4ddfbb27cd6a29f48e4d"
+                        src={whatsappBg}
                         className="object-cover absolute inset-0 size-full"
                         alt="Chat background"
                     />
                     <ChatHeader />
-                    <div className="flex relative flex-col items-start px-4 pt-48 mt-5">
-                        <div className="shrink-0 mt-48 max-w-full h-px border border-solid border-zinc-100 w-[282px]" />
-                        <div className="flex z-10 shrink-0 h-px bg-white bg-opacity-0 w-[7px]" />
-                        <div className="flex flex-col self-stretch -mt-48">
+                    <div className="flex relative flex-col items-start px-4 mt-5">
+                        <div className="flex flex-col self-stretch">
                             {messages.map((message, index) => (
                                 <ChatMessage key={index} {...message} />
                             ))}
                         </div>
-                        <div className="z-10 shrink-0 max-w-full h-px border border-solid border-zinc-100 w-[282px]" />
                         <div className="flex flex-col self-stretch w-full text-xs leading-loose text-neutral-200">
-                            <div className="flex shrink-0 h-px bg-white bg-opacity-0 w-[7px]" />
                             <ChatInput />
                         </div>
                     </div>
@@ -591,12 +1416,9 @@ const ChatInterface = () => {
 
 const ChatbotList = ({ pagination, setCategoryId }) => {
     const [showModalDelete, setShowModalDelete] = useState(false);
-    const [showModalSetting, setShowModalSetting] = useState(false);
 
     const handleShowDelete = () => setShowModalDelete(true);
     const handleCloseDelete = () => setShowModalDelete(false);
-    const handleShowSetting = () => setShowModalSetting(true);
-    const handleCloseSetting = () => setShowModalSetting(false);
 
     const handleOnShowDelete = () => {
         console.log("Modal is now shown");
@@ -604,16 +1426,6 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
     };
 
     const handleOnCloseDelete = () => {
-        console.log("Modal is now hidden");
-        // Additional logic when the modal is hidden
-    };
-
-    const handleOnShowSetting = () => {
-        console.log("Modal is now shown");
-        // Additional logic when the modal is shown
-    };
-
-    const handleOnCloseSetting = () => {
         console.log("Modal is now hidden");
         // Additional logic when the modal is hidden
     };
@@ -655,15 +1467,44 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
         }
     ];
 
+    const [canScroll, setCanScroll] = useState(false);
+    const [selectedChatbot, setSelectedChatbot] = useState("JTSMobile Bot");
+
+    const canScrollDown = (element) => {
+        return element?.scrollHeight > element?.clientHeight;
+    };
+
+    const onPressNextPage = () => {};
+
+    const onPressPrevPage = () => {};
+
     return (
-        <div className="flex flex-col md:flex-row w-full gap-10">
+        <div className="flex flex-col xl:flex-row w-full gap-10">
             <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-full">
                 <div
-                    style={{ height: "60vh", overflowY: "scroll" }}
-                    className="overflow-x-auto border bg-white border-slate-100 rounded-xl"
+                    onScroll={() => {
+                        setCanScroll(
+                            canScrollDown(
+                                document.querySelector(".scrolling-table")
+                            )
+                        );
+                    }}
+                    style={{
+                        height: "60vh",
+                        overflowY: "scroll",
+                        position: "relative",
+                        width: "100%"
+                    }}
+                    className="border bg-white border-slate-100 rounded-xl scrolling-table"
                 >
-                    <table className="text-left">
-                        <thead className="text-slate-700 font-normal table-bg ">
+                    <table className=" text-left w-full">
+                        <thead
+                            style={{
+                                position: "sticky",
+                                top: 0
+                            }}
+                            className="text-slate-700 font-normal table-bg "
+                        >
                             <tr className=" font-medium">
                                 <td className="px-3 py-3"></td>
                                 <td className="px-3 py-3">ID</td>
@@ -676,11 +1517,35 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
                         <tbody>
                             {chatbotData.length > 0 ? (
                                 chatbotData?.map((value, index) => {
+                                    const isSelected =
+                                        value.chatbotName === selectedChatbot;
                                     return (
-                                        <tr className="bg-white border-b border-slate-50 last:border-none hover:bg-gray-50 ">
+                                        <tr
+                                            key={index}
+                                            className="bg-white border-b border-slate-50 last:border-none hover:bg-gray-50 "
+                                        >
                                             <td className="px-4 py-4">
                                                 <h5 className="font-base cursor-pointer justify-center text-gray-500 flex items-center space-x-1">
-                                                    {value.id}
+                                                    <div
+                                                        onClick={() =>
+                                                            setSelectedChatbot(
+                                                                value.chatbotName
+                                                            )
+                                                        }
+                                                        className={`flex flex-col justify-center self-stretch p-1.5 rounded-full border-2 ${isSelected ? "border-teal-600" : "border-zinc-500"} border-solid  h-[24px] w-[24px]`}
+                                                    >
+                                                        {isSelected && (
+                                                            <div
+                                                                className="flex shrink-0 bg-teal-600 rounded-full"
+                                                                style={{
+                                                                    width: 16,
+                                                                    height: 16,
+                                                                    marginLeft:
+                                                                        -4
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
                                                 </h5>
                                             </td>
                                             <td className="px-2 py-4">
@@ -702,8 +1567,8 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
                                             <td className="px-2 py-4 text-gray-600 font-medium">
                                                 <div className=" flex items-center space-x-3 justify-center">
                                                     <button
-                                                        onClick={
-                                                            handleShowSetting
+                                                        onClick={() =>
+                                                            setCategoryId(8)
                                                         }
                                                     >
                                                         <UilSetting size={17} />
@@ -734,89 +1599,87 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
                                     </td>
                                 </tr>
                             )}
-                            {chatbotData.length > 0 && (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="px-8 py-5 table-bg text-right text-sm"
-                                    >
-                                        <div className=" flex items-center justify-end space-x-6">
-                                            <div>
-                                                <span className=" text-gray-500 mr-1">
-                                                    Rows per page:
-                                                </span>{" "}
-                                                <span className=" text-gray-500">
-                                                    {per_page}
-                                                </span>
-                                            </div>
-                                            <div className=" text-gray-500 mr-5">
-                                                {form} - {to} of {total}
-                                            </div>
-                                            <div className=" flex items-center">
-                                                {currentPage > 1 ? (
-                                                    <Link
-                                                        href={
-                                                            "/user/documents?page=" +
-                                                            (currentPage - 1)
-                                                        }
-                                                    >
-                                                        <UilAngleLeft
-                                                            size={25}
-                                                            className={
-                                                                currentPage > 1
-                                                                    ? "text-gray-500"
-                                                                    : "text-slate-300 pointer-events-none"
-                                                            }
-                                                        />
-                                                    </Link>
-                                                ) : (
-                                                    <button className="pointer-events-none">
-                                                        <UilAngleLeft
-                                                            size={25}
-                                                            className={
-                                                                currentPage > 1
-                                                                    ? "text-gray-500"
-                                                                    : "text-slate-300 pointer-events-none"
-                                                            }
-                                                        />
-                                                    </button>
-                                                )}
-
-                                                {to < total ? (
-                                                    <Link
-                                                        href={
-                                                            "/user/documents?page=" +
-                                                            (currentPage + 1)
-                                                        }
-                                                    >
-                                                        <UilAngleRight
-                                                            size={25}
-                                                            className={
-                                                                to < total
-                                                                    ? "text-gray-500"
-                                                                    : "text-slate-300 pointer-events-none"
-                                                            }
-                                                        />
-                                                    </Link>
-                                                ) : (
-                                                    <button className=" pointer-events-none">
-                                                        <UilAngleRight
-                                                            size={25}
-                                                            className={
-                                                                to < total
-                                                                    ? "text-gray-500"
-                                                                    : "text-slate-300 pointer-events-none"
-                                                            }
-                                                        />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
+                    <div
+                        className="bg-white py-6 pr-6 rounded-b-xl"
+                        style={{
+                            position: canScroll ? "sticky" : "absolute",
+                            left: 0,
+                            bottom: 0,
+                            right: 0,
+                            width: "100%"
+                        }}
+                    >
+                        <div className=" flex items-center justify-end space-x-6">
+                            <div>
+                                <span className=" text-gray-500 mr-1">
+                                    Rows per page:
+                                </span>{" "}
+                                <span className=" text-gray-500">
+                                    {per_page}
+                                </span>
+                            </div>
+                            <div className=" text-gray-500 mr-5">
+                                {form} - {to} of {total}
+                            </div>
+                            <div className=" flex items-center">
+                                {currentPage > 1 ? (
+                                    <div
+                                        className=" cursor-pointer"
+                                        onClick={onPressPrevPage}
+                                    >
+                                        <UilAngleLeft
+                                            size={25}
+                                            className={
+                                                currentPage > 1
+                                                    ? "text-gray-500"
+                                                    : "text-slate-300 pointer-events-none"
+                                            }
+                                        />
+                                    </div>
+                                ) : (
+                                    <button className="pointer-events-none">
+                                        <UilAngleLeft
+                                            size={25}
+                                            className={
+                                                currentPage > 1
+                                                    ? "text-gray-500"
+                                                    : "text-slate-300 pointer-events-none"
+                                            }
+                                        />
+                                    </button>
+                                )}
+
+                                {to < total ? (
+                                    <div
+                                        className=" cursor-pointer"
+                                        onClick={onPressNextPage}
+                                    >
+                                        <UilAngleRight
+                                            size={25}
+                                            className={
+                                                to < total
+                                                    ? "text-gray-500"
+                                                    : "text-slate-300 pointer-events-none"
+                                            }
+                                        />
+                                    </div>
+                                ) : (
+                                    <button className=" pointer-events-none">
+                                        <UilAngleRight
+                                            size={25}
+                                            className={
+                                                to < total
+                                                    ? "text-gray-500"
+                                                    : "text-slate-300 pointer-events-none"
+                                            }
+                                        />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <ModalDelete
                     showModal={showModalDelete}
@@ -840,17 +1703,6 @@ const ChatbotList = ({ pagination, setCategoryId }) => {
                         </p>
                     </section>
                 </ModalDelete>
-                <ModalChatbot
-                    showModal={showModalSetting}
-                    handleClose={handleCloseSetting}
-                    title="BJTSA Bot"
-                    onShow={handleOnShowSetting}
-                    onClose={handleOnCloseSetting}
-                >
-                    <div className="px-8 flex overflow-scroll flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
-                        <ChatbotModalContent />
-                    </div>
-                </ModalChatbot>
             </div>
             <ChatInterface />
         </div>
@@ -1072,6 +1924,301 @@ const ChatbotCreation = ({ setCategoryId }) => {
     );
 };
 
+const DocumentList = ({ pagination, setCategoryId }) => {
+    const {
+        per_page,
+        currentPage,
+        form,
+        lastPage,
+        next_page_url,
+        prev_page_url,
+        to,
+        total
+    } = pagination ?? {
+        per_page: null,
+        currentPage: null,
+        form: null,
+        lastPage: null,
+        next_page_url: null,
+        prev_page_url: null,
+        to: null,
+        total: null
+    };
+
+    const [documentData, setDocumentData] = useState([]);
+    const [showModalDelete, setShowModalDelete] = useState(false);
+
+    const handleShowDelete = () => setShowModalDelete(true);
+    const handleCloseDelete = () => setShowModalDelete(false);
+
+    const handleOnShowDelete = () => {
+        console.log("Modal is now shown");
+        // Additional logic when the modal is shown
+    };
+
+    const handleOnCloseDelete = () => {
+        console.log("Modal is now hidden");
+        // Additional logic when the modal is hidden
+    };
+
+    useEffect(() => {
+        setDocumentData([
+            {
+                id: "1234as342",
+                name: "https://file-examples.com/wp-content/storage/2017/02/file-sample_100kB.doc",
+                type: "file",
+                date: "01/08/2024 01:02:03",
+                insertedBy: "Chantu",
+                dateStart: "01/08/2024 01:02:03",
+                dateEnd: "01/08/2024 01:02:03"
+            },
+            {
+                id: "71rt62j49",
+                name: "https://www.produk.com/jtms",
+                type: "url",
+                date: "02/08/2024 11:22:33",
+                insertedBy: "Abdil",
+                dateStart: "01/08/2024 01:02:03",
+                dateEnd: "01/08/2024 01:02:03"
+            }
+        ]);
+    }, []);
+
+    const onPressNextPage = () => {};
+
+    const onPressPrevPage = () => {};
+
+    return (
+        <section className="flex flex-col justify-center w-full">
+            <div className="bg-gradient-to-r p-[1px] from-[var(--gradient-green-color-1)] to-[var(--gradient-green-color-2)] rounded-xl h-auto mb-8 mt-4">
+                <div className="overflow-x-auto border bg-white border-slate-100 rounded-xl">
+                    <table className="w-full text-left">
+                        <thead className="text-slate-700 font-normal table-bg ">
+                            <tr className=" font-medium">
+                                <td className="px-6 py-6"># ^</td>
+                                <td className="px-3 py-6">ID</td>
+                                <td className="px-3 py-6">Name</td>
+                                <td className="px-3 py-6">Type</td>
+                                <td className="px-3 py-6">Upload Date</td>
+                                <td className="px-3 py-6">Upload By</td>
+                                <td className="px-3 py-6">Date Start</td>
+                                <td className="px-3 py-6">Date End</td>
+                                <td className="px-3 py-6">Action</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {documentData.length > 0 ? (
+                                documentData?.map((value, index) => {
+                                    return (
+                                        <tr className="bg-white border-b border-slate-50 last:border-none   hover:bg-gray-50 ">
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {index + 1}
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.id}
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.name}
+                                            </td>
+                                            <td className="px-2 py-4 text-gray-600 font-medium">
+                                                <div className=" flex items-center space-x-3 justify-center">
+                                                    {value.type === "file" ? (
+                                                        <img
+                                                            src={iconFile}
+                                                            alt=""
+                                                            className="object-contain w-5 aspect-square"
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={iconLink}
+                                                            alt=""
+                                                            className="object-contain w-5 aspect-square"
+                                                        />
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.date}
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.insertedBy}
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.dateStart}
+                                            </td>
+                                            <td className="px-2 py-4 text-base text-gray-500 font-normal">
+                                                {value.dateEnd}
+                                            </td>
+                                            <td className="px-2 py-4 text-gray-600 font-medium">
+                                                <div className=" flex items-center space-x-3 justify-center">
+                                                    {value.type === "file" ? (
+                                                        <button
+                                                            onClick={() => {
+                                                                window.location.href =
+                                                                    value.name;
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={
+                                                                    iconDownloadIcon
+                                                                }
+                                                                alt=""
+                                                                className="object-contain w-5 aspect-square"
+                                                            />
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => {
+                                                                window.open(
+                                                                    value.name,
+                                                                    "_blank"
+                                                                );
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={iconNewtab}
+                                                                alt=""
+                                                                className="object-contain w-5 aspect-square"
+                                                            />
+                                                        </button>
+                                                    )}
+
+                                                    <button
+                                                        onClick={
+                                                            handleShowDelete
+                                                        }
+                                                    >
+                                                        <UilTrashAlt
+                                                            size={20}
+                                                        />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                <tr>
+                                    <td
+                                        colSpan="9"
+                                        className="px-8 py-6 text-slate-400 text-center"
+                                    >
+                                        You have no documents yet. Please upload
+                                        documents first.
+                                    </td>
+                                </tr>
+                            )}
+                            {documentData.length > 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={9}
+                                        className="px-8 py-5 table-bg text-right text-sm"
+                                    >
+                                        <div className=" flex items-center justify-end space-x-6">
+                                            <div>
+                                                <span className=" text-gray-500 mr-1">
+                                                    Rows per page:
+                                                </span>{" "}
+                                                <span className=" text-gray-500">
+                                                    {per_page}
+                                                </span>
+                                            </div>
+                                            <div className=" text-gray-500 mr-5">
+                                                {form} - {to} of {total}
+                                            </div>
+                                            <div className=" flex items-center">
+                                                {currentPage > 1 ? (
+                                                    <div
+                                                        className=" cursor-pointer"
+                                                        onClick={
+                                                            onPressPrevPage
+                                                        }
+                                                    >
+                                                        <UilAngleLeft
+                                                            size={25}
+                                                            className={
+                                                                currentPage > 1
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <button className="pointer-events-none">
+                                                        <UilAngleLeft
+                                                            size={25}
+                                                            className={
+                                                                currentPage > 1
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </button>
+                                                )}
+
+                                                {to < total ? (
+                                                    <div
+                                                        className=" cursor-pointer"
+                                                        onClick={
+                                                            onPressNextPage
+                                                        }
+                                                    >
+                                                        <UilAngleRight
+                                                            size={25}
+                                                            className={
+                                                                to < total
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <button className=" pointer-events-none">
+                                                        <UilAngleRight
+                                                            size={25}
+                                                            className={
+                                                                to < total
+                                                                    ? "text-gray-500"
+                                                                    : "text-slate-300 pointer-events-none"
+                                                            }
+                                                        />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <ModalDelete
+                showModal={showModalDelete}
+                handleClose={handleCloseDelete}
+                title=""
+                onShow={handleOnShowDelete}
+                onClose={handleOnCloseDelete}
+                onDelete={() => {}}
+            >
+                <section className="flex flex-col items-center pt-6 pb-12 bg-white rounded-xl max-md:px-5">
+                    <img
+                        src={iconTrash}
+                        className="object-contain mt-16 aspect-[0.88] w-[66px] max-md:mt-10"
+                    />
+                    <h2 className="mt-6 text-2xl font-semibold text-center text-slate-700">
+                        Delete Bank Jupiter Finance
+                    </h2>
+                    <p className="mt-10 text-lg font-medium leading-8 text-center text-gray-500">
+                        Are you sure you want to delete this document? This
+                        action cannot be undone.
+                    </p>
+                </section>
+            </ModalDelete>
+        </section>
+    );
+};
+
 const DocumentUpload = ({ pagination, setCategoryId }) => {
     const {
         per_page,
@@ -1096,23 +2243,27 @@ const DocumentUpload = ({ pagination, setCategoryId }) => {
     const [documentData, setDocumentData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isEmptyDocs, setIsEmptyDocs] = useState(true);
+    const [isEmptyURLs, setIsEmptyURLs] = useState(false);
     // const [selectedDocument, setSelectedDocument] = useState(["1234as342"]);
 
     const onPressContinue = () => {
-        if (isEmptyDocs) {
-            toast("Please upload the file first", {
-                type: toast.TYPE.ERROR,
-                hideProgressBar: true
-            });
-        } else if (isLoading) {
-            toast("Upload still in progress", {
-                type: toast.TYPE.ERROR,
-                hideProgressBar: true
-            });
-        } else {
-            setCategoryId(7);
-            window?.scrollTo(0, 0);
-        }
+        // if (!isEmptyDocs && !isEmptyURLs) {
+        //     toast("Please upload the file or url first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else if (isLoading) {
+        //     toast("Upload still in progress", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else {
+        //     setCategoryId(7);
+        //     window?.scrollTo(0, 0);
+        // }
+
+        setCategoryId(7);
+        window?.scrollTo(0, 0);
     };
 
     const onPressBack = () => {
@@ -1165,7 +2316,7 @@ const DocumentUpload = ({ pagination, setCategoryId }) => {
             </section>
             <div className="px-10">
                 <h2 className="z-10 mt-12 text-lg font-medium leading-none text-gray-700">
-                    Upload New Documents<span className="text-red-500">*</span>
+                    Upload New Documents
                 </h2>
                 <UploadArea
                     setIsEmptyDocs={setIsEmptyDocs}
@@ -1212,7 +2363,7 @@ const DocumentUpload = ({ pagination, setCategoryId }) => {
                                                 <td className="px-2 py-4 text-base text-gray-500 font-normal">
                                                     {value.name}
                                                 </td>
-                                                <td className="px-2 py-4 text-base flex justify-center items-centerl">
+                                                <td className="px-2 py-4 text-base flex justify-center items-center">
                                                     {value.type === "file" ? (
                                                         <img
                                                             src={iconFile}
@@ -1360,6 +2511,107 @@ const DocumentUpload = ({ pagination, setCategoryId }) => {
                     disabled={false}
                     variant="primary"
                     label="Continue"
+                />
+            </div>
+        </section>
+    );
+};
+
+const DocumentUploadManagement = ({ pagination, setCategoryId }) => {
+    const {
+        per_page,
+        currentPage,
+        form,
+        lastPage,
+        next_page_url,
+        prev_page_url,
+        to,
+        total
+    } = pagination ?? {
+        per_page: null,
+        currentPage: null,
+        form: null,
+        lastPage: null,
+        next_page_url: null,
+        prev_page_url: null,
+        to: null,
+        total: null
+    };
+
+    const [documentData, setDocumentData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEmptyDocs, setIsEmptyDocs] = useState(true);
+    const [isEmptyURLs, setIsEmptyURLs] = useState(false);
+    // const [selectedDocument, setSelectedDocument] = useState(["1234as342"]);
+
+    const onPressContinue = () => {
+        // if (!isEmptyDocs && !isEmptyURLs) {
+        //     toast("Please upload the file or url first", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else if (isLoading) {
+        //     toast("Upload still in progress", {
+        //         type: toast.TYPE.ERROR,
+        //         hideProgressBar: true
+        //     });
+        // } else {
+        //     setCategoryId(7);
+        //     window?.scrollTo(0, 0);
+        // }
+
+        setCategoryId(2);
+        window?.scrollTo(0, 0);
+    };
+
+    const onPressCancel = () => {
+        setCategoryId(2);
+        window?.scrollTo(0, 0);
+    };
+
+    useEffect(() => {
+        setDocumentData([
+            {
+                id: "1234as342",
+                name: "Bank Jatis Financ...",
+                type: "file",
+                date: "01/08/2024 01:02:03",
+                insertedBy: "Chantu"
+            },
+            {
+                id: "71rt62j49",
+                name: "produk.com/jtms",
+                type: "url",
+                date: "02/08/2024 11:22:33",
+                insertedBy: "Abdil"
+            }
+        ]);
+    }, []);
+
+    return (
+        <section className="flex flex-col justify-center w-full">
+            <div className="px-10">
+                <h2 className="z-10 mt-12 text-lg font-medium leading-none text-gray-700">
+                    Upload New Documents
+                </h2>
+                <UploadArea
+                    setIsEmptyDocs={setIsEmptyDocs}
+                    setIsLoading={setIsLoading}
+                />
+                <UrlInput />
+            </div>
+            <div className="flex gap-2 px-10 items-start self-end mt-14 text-sm font-medium leading-none text-center whitespace-nowrap text-slate-600 max-md:mt-10">
+                <BottomButton
+                    onPress={onPressCancel}
+                    disabled={false}
+                    variant="text"
+                    label="Cancel"
+                />
+                <BottomButton
+                    onPress={onPressContinue}
+                    disabled={false}
+                    variant="primary"
+                    label="Submit"
                 />
             </div>
         </section>

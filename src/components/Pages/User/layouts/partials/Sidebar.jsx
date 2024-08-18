@@ -271,8 +271,12 @@ export default function Sidebar({ auth, logo, mobileMenu, mobileClose }) {
                                 className="flex items-center py-1.5 2xl:px-5 xl:px-5 lg:px-3.5 md:px-4 xs:px-4"
                                 to="/user/settings"
                             >
-                                <UilSetting className=" inline-block" />{" "}
-                                <div className="font-normal 2xl:text-lg xl:text-lg lg:text-base mt-1 ml-2 flex items-center">
+                                <UilSetting
+                                    className={` inline-block ${history?.location?.pathname === "/user/settings" ? " text-white" : ""}`}
+                                />
+                                <div
+                                    className={`font-normal ${history?.location?.pathname === "/user/settings" ? " text-white" : ""} 2xl:text-lg xl:text-lg lg:text-base mt-1 ml-2 flex items-center`}
+                                >
                                     {t("Settings")}
                                 </div>
                             </Link>
@@ -284,8 +288,12 @@ export default function Sidebar({ auth, logo, mobileMenu, mobileClose }) {
                                 className="flex items-center py-1.5 2xl:px-5 xl:px-5 lg:px-3.5 md:px-4 xs:px-4"
                                 to="/user/report"
                             >
-                                <UilCreditCard className=" inline-block" />{" "}
-                                <div className="font-normal 2xl:text-lg xl:text-lg lg:text-base mt-1 ml-2 flex items-center">
+                                <UilCreditCard
+                                    className={` inline-block ${history?.location?.pathname === "/user/report" ? " text-white" : ""}`}
+                                />
+                                <div
+                                    className={`font-normal ${history?.location?.pathname === "/user/report" ? " text-white" : ""} 2xl:text-lg xl:text-lg lg:text-base mt-1 ml-2 flex items-center`}
+                                >
                                     Report
                                 </div>
                             </Link>

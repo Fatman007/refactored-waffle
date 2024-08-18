@@ -24,7 +24,7 @@ const UrlInput = () => {
     return (
         <>
             <h3 className="mt-14 text-lg font-medium leading-none text-gray-700 max-md:mt-10">
-                Enter URL (optional)
+                Enter Web URL
             </h3>
             {urlList?.map((item) => {
                 return (

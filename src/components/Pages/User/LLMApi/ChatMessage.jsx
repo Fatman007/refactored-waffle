@@ -1,4 +1,6 @@
 import React from "react";
+import triangleIcon from "../../../../assets/frontend/img/chattriangle.svg";
+import waUnionIcon from "../../../../assets/frontend/img/waunion.svg";
 
 const ChatMessage = ({ content, time, isUser }) => {
     return (
@@ -12,15 +14,21 @@ const ChatMessage = ({ content, time, isUser }) => {
                 >
                     <div className="leading-5 text-black">{content}</div>
                     <div
-                        className={`mt-1 text-right ${isUser ? "text-black text-opacity-10" : "text-zinc-400"}`}
+                        className={`mt-1 flex flex-row justify-end ${isUser ? "text-black text-opacity-10" : "text-zinc-400"}`}
                     >
-                        {time}
+                        <div>{time}</div>
+                        {isUser && (
+                            <img
+                                src={waUnionIcon}
+                                className="object-contain shrink-0 w-3 aspect-[0.53] ml-1"
+                                alt=""
+                            />
+                        )}
                     </div>
                 </div>
                 {isUser && (
                     <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/bc3820b24fdba148edeea0b5836112d4b8deadb3961b3c9cdcabb4125d1150e7?placeholderIfAbsent=true&apiKey=c894d7e13beb4ddfbb27cd6a29f48e4d"
+                        src={triangleIcon}
                         className="object-contain shrink-0 w-2 aspect-[0.53]"
                         alt=""
                     />

@@ -65,10 +65,10 @@ export default function Dashboard(props) {
         },
         {
             name: "tuesday",
-            AiWrite: 200,
-            Images: 200,
+            AiWrite: 100,
+            Images: 400,
             Code: 300,
-            aiSpeechToText: 400
+            aiSpeechToText: 300
         }
     ];
     const [levelUsesDocument, setLevelUsesDocument] = useState(false);
@@ -476,6 +476,7 @@ export default function Dashboard(props) {
                                                                                 {
                                                                                     entry.name
                                                                                 }
+
                                                                                 :{" "}
                                                                             </span>
                                                                             <span className="tooltip-value">

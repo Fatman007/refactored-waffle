@@ -1118,3 +1118,24 @@
     font-size: 16px;
     line-height: 16px;
 }
+
+.border-teal-important {
+    border-color: teal !important;
+}
+
+.border-teal-important:focus {
+    border-color: teal !important;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 2s linear infinite;
+}

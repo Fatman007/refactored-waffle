@@ -13,6 +13,7 @@ import Document from "./Pages/User/Document";
 import Chats from "./Pages/User/Chats";
 import ChatShow from "./Pages/User/ChatShow";
 import LLMApi from "./Pages/User/LLMApi/LLMApi";
+import ComingSoon from "./Pages/User/ComingSoon";
 
 import { variables } from "../common/Variable";
 
@@ -161,9 +162,13 @@ const conversation = {
 
 const MainRoute = () => {
     useEffect(() => {
-        variables.socket = socketIOClient(
-            process.env.REACT_APP_NODE_BACKEND_URL
-        );
+        const currentPath = window.location.pathname;
+        if (currentPath === "/" || currentPath === "") {
+            window.location.href = "/user/llm";
+        }
+        // variables.socket = socketIOClient(
+        //     process.env.REACT_APP_NODE_BACKEND_URL
+        // );
     }, []);
 
     return (
@@ -171,7 +176,7 @@ const MainRoute = () => {
             <Switch>
                 {/* <Routes path="/" exact component={Welcome} /> */}
                 <Routes path="/" exact>
-                    <LLMApi logo={logo} documents={{ data: documents }} />
+                    <Dashboard logo={logo} documents={{ data: documents }} />
                 </Routes>
                 {/* <Routes path="/login">
                     <Login logo={logo} />
@@ -186,13 +191,19 @@ const MainRoute = () => {
                     <LLMApi logo={logo} documents={{ data: documents }} />
                 </Routes>
                 <Routes path="/user/stt">
-                    <ComingSoon />
+                    <ComingSoon logo={logo} />
                 </Routes>
                 <Routes path="/user/tts">
-                    <ComingSoon />
+                    <ComingSoon logo={logo} />
                 </Routes>
                 <Routes path="/user/vtt">
-                    <ComingSoon />
+                    <ComingSoon logo={logo} />
+                </Routes>
+                <Routes path="/user/settings">
+                    <ComingSoon logo={logo} />
+                </Routes>
+                <Routes path="/user/report">
+                    <ComingSoon logo={logo} />
                 </Routes>
                 {/* <Routes path="/user/ai/chats">
                     <Chats logo={logo} aiChats={{ data: [templates[2]] }} />
@@ -225,46 +236,6 @@ const NoMatch = () => {
                     />
                     <h2 class="text-2xl my-8 text-gray-500 font-mono">
                         OPPS!! Page Not Found.
-                    </h2>
-                    <div
-                        onClick={() => history.goBack()}
-                        class="bg-gradient text-white px-10 py-3.5 text-lg rounded-full font-mono flex items-center justify-center space-x-4 max-w-max mx-auto"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="currentColor"
-                            class="bi bi-arrow-left"
-                            viewBox="0 0 16 16"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
-                            />
-                        </svg>{" "}
-                        <span>Go Back</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const ComingSoon = () => {
-    const history = useHistory();
-
-    return (
-        <div class="container mx-auto">
-            <div class=" w-full h-screen flex items-center justify-center">
-                <div class=" text-center">
-                    <img
-                        class="h-96 w-full object-cover"
-                        src={notFoundLogo}
-                        alt=""
-                    />
-                    <h2 class="text-2xl my-8 text-gray-500 font-mono">
-                        This feature is coming soon.
                     </h2>
                     <div
                         onClick={() => history.goBack()}

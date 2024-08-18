@@ -26,6 +26,7 @@ import chatbotIcon from "../../../../../assets/frontend/img/grid-chatbot.png";
 import broadcastIcon from "../../../../../assets/frontend/img/grid-broadcast.png";
 import helpIcon from "../../../../../assets/frontend/img/grid-help.png";
 import accountIcon from "../../../../../assets/frontend/img/grid-account.png";
+import profilePng from "../../../../../assets/frontend/img/profile1.png";
 
 // Create a mapping object for the icons
 const iconMapping = {
@@ -369,7 +370,7 @@ export default function Navbar(props) {
                                         width: 32,
                                         height: 32
                                     }}
-                                    src={`${profile}`}
+                                    src={profilePng}
                                     alt=""
                                 />
                             </button>
