@@ -44,17 +44,20 @@ const UrlInput = () => {
                 );
             })}
 
-            <div className="flex flex-wrap self-stretch mt-3.5 w-full max-md:max-w-full">
-                <div className="flex flex-col grow shrink-0 basis-0 w-fit max-md:max-w-full">
-                    <div className="flex flex-wrap gap-2 items-start pr-2 w-full bg-white rounded border border-solid border-teal-600 max-md:max-w-full">
+            <div className="flex flex-wrap self-stretch mt-3.5 w-full max-md:flex-col">
+                <div className="flex flex-col grow shrink-0 basis-0 w-fit max-md:w-full">
+                    <div className="flex flex-wrap gap-2 items-start pr-2 w-full bg-white rounded border border-solid border-teal-600 max-md:w-full">
                         <input
                             type="url"
                             placeholder="https://login.coster.id/login"
-                            className="grow shrink text-sm border-none rounded leading-none max-md:max-w-full"
+                            className="grow shrink text-sm border-none rounded leading-none max-md:w-full"
                         />
                     </div>
                 </div>
-                <button className="gap-2.5 self-start px-8 py-2 ml-8 text-sm font-medium leading-none text-teal-600 whitespace-nowrap bg-white rounded border border-teal-600 border-solid max-md:px-5">
+                <button
+                    style={{ paddingTop: 9, paddingBottom: 9 }}
+                    className="gap-2.5 self-start px-8 ml-8 text-sm font-medium leading-none text-teal-600 whitespace-nowrap bg-white rounded border border-teal-600 border-solid max-md:ml-0 max-md:mt-2"
+                >
                     ADD
                 </button>
             </div>
