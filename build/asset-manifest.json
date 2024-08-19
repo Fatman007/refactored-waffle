@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.6c498fc1.css",
-    "main.js": "/static/js/main.0236f9d9.js",
+    "main.css": "/static/css/main.de4c6f83.css",
+    "main.js": "/static/js/main.c5b9b2a3.js",
     "static/js/453.01016ecc.chunk.js": "/static/js/453.01016ecc.chunk.js",
     "static/media/3d-rocket.png": "/static/media/3d-rocket.0f664f5a68311e6a8ae9.png",
     "static/media/Hiragino-Kaku-Gothic-Std.otf": "/static/media/Hiragino-Kaku-Gothic-Std.5c09ac63ebd18308299e.otf",
@@ -58,12 +58,12 @@
     "static/media/downloadicon.svg": "/static/media/downloadicon.0fab49d5e695f67560d76bfc42033a2c.svg",
     "static/media/chattriangle.svg": "/static/media/chattriangle.318e94002418426f931f4d3600ece776.svg",
     "static/media/newtab.svg": "/static/media/newtab.354d33f83a260914a1648334ccf35b60.svg",
-    "main.6c498fc1.css.map": "/static/css/main.6c498fc1.css.map",
-    "main.0236f9d9.js.map": "/static/js/main.0236f9d9.js.map",
+    "main.de4c6f83.css.map": "/static/css/main.de4c6f83.css.map",
+    "main.c5b9b2a3.js.map": "/static/js/main.c5b9b2a3.js.map",
     "453.01016ecc.chunk.js.map": "/static/js/453.01016ecc.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6c498fc1.css",
-    "static/js/main.0236f9d9.js"
+    "static/css/main.de4c6f83.css",
+    "static/js/main.c5b9b2a3.js"
   ]
 }
